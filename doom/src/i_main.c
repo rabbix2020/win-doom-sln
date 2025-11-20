@@ -41,12 +41,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #ifdef _DEBUG
     if (AllocConsole())
     {
-        // Redirect STDOUT to the console
-        FILE* fp;
-        freopen_s(&fp, "CONOUT$", "w", stdout);
-        freopen_s(&fp, "CONOUT$", "w", stderr);
-        // (Optionally, redirect STDIN if you plan on using scanf or similar)
-        freopen_s(&fp, "CONIN$", "r", stdin);
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+
+        freopen("CONIN$", "r", stdin);
     }
 #endif
 
@@ -56,13 +54,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 int
 main
-( int		argc,
-  char**	argv ) 
-{ 
-    myargc = argc; 
-    myargv = argv; 
- 
-    D_DoomMain (); 
+(int		argc,
+    char** argv)
+{
+    myargc = argc;
+    myargv = argv;
+
+    D_DoomMain();
 
     return 0;
-} 
+}

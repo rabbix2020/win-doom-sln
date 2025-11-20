@@ -123,15 +123,20 @@ void I_Quit (void)
 
 void I_WaitVBL(int count)
 {
-#ifdef SGI
-    sginap(1);                                           
-#else
-#ifdef SUN
-    sleep(0);
-#else   
-    _sleep(count * (1000/70));
-#endif
-#endif
+    struct timespec	tp;
+    timespec_get(&tp, TIME_UTC);
+    long cur_time = tp.tv_sec * 1000 + (tp.tv_nsec / 1000000);
+    long end_time = cur_time + (count * (1000 / 70));
+
+    while (cur_time < end_time) // this is all need just to update sound when D_DoomLoop can't
+    {
+        timespec_get(&tp, TIME_UTC);
+        cur_time = tp.tv_sec * 1000 + (tp.tv_nsec / 1000000);
+
+        I_UpdateSound();
+        I_SubmitSound();
+        _sleep(1000 / 70);
+    }
 }
 
 void I_BeginRead(void)
@@ -160,11 +165,22 @@ extern Dboolean demorecording;
 void I_Error (char *error, ...)
 {
     va_list	argptr;
+    char error_msg[256];
 
     // Message first.
     va_start (argptr,error);
     fprintf (stderr, "Error: ");
+    strcpy(error_msg, "Error: ");
+
     vfprintf (stderr,error,argptr);
+    
+    char temp_str[248];
+    strcpy(temp_str, error);
+    _vsnprintf_s(temp_str, sizeof(temp_str) + 1, sizeof(temp_str), error, argptr);
+    strcat(error_msg, temp_str);
+
+    MessageBoxA(NULL, temp_str, "DOOM", MB_ICONERROR);
+
     fprintf (stderr, "\n");
     va_end (argptr);
 
@@ -176,6 +192,6 @@ void I_Error (char *error, ...)
 
     D_QuitNetGame ();
     I_ShutdownGraphics();
-    
+
     exit(-1);
 }

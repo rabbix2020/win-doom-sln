@@ -141,9 +141,9 @@ STlib_drawNum
 	V_DrawPatch(x, n->y, FG, n->p[ num % 10 ]);
 	num /= 10;
     }
-
+    
     // draw a minus sign if necessary
-    if (neg)
+    if (neg & (int)sttminus)
 	V_DrawPatch(x - 8, n->y, FG, sttminus);
 }
 

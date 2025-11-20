@@ -124,7 +124,7 @@ int             gametic;
 int             levelstarttic;          // gametic at level start 
 int             totalkills, totalitems, totalsecret;    // for intermission 
  
-char            demoname[32]; 
+char            demoname[32*8]; 
 Dboolean         demorecording; 
 Dboolean         demoplayback; 
 Dboolean		netdemo; 
@@ -455,9 +455,9 @@ void G_DoLoadLevel (void)
 
     // DOOM determines the sky texture to be used
     // depending on the current episode, and the game version.
-    if ( (gamemode == commercial)
-	 || ( gamemode == pack_tnt )
-	 || ( gamemode == pack_plut ) )
+    if ( (gamemission == doom2)
+	 || (gamemission == pack_tnt )
+	 || (gamemission == pack_plut ) )
     {
 	skytexture = R_TextureNumForName ("SKY3");
 	if (gamemap < 12)
@@ -1585,22 +1585,29 @@ void G_DoPlayDemo (void)
     int             i, episode, map; 
 	 
     gameaction = ga_nothing; 
-    demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC); 
-    if ( *demo_p++ != VERSION)
-    {
-      fprintf( stderr, "Demo is from a different game version!\n");
-      gameaction = ga_nothing;
-      return;
-    }
-    
+
+    demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC);
+	if (gamemode == registered) {
+		printf("Demo was recorded in older version of the game! than 1.9 and it might desync!\n");
+	}
+	else
+	{
+		if (*demo_p++ != VERSION)
+		{
+			fprintf(stdout, "Demo might desync because this demo is from a different version of the game!\n");
+		}
+	}
+
     skill = *demo_p++; 
     episode = *demo_p++; 
     map = *demo_p++; 
-    deathmatch = *demo_p++;
-    respawnparm = *demo_p++;
-    fastparm = *demo_p++;
-    nomonsters = *demo_p++;
-    consoleplayer = *demo_p++;
+	if (gamemode != registered) {
+		deathmatch = *demo_p++;
+		respawnparm = *demo_p++;
+		fastparm = *demo_p++;
+		nomonsters = *demo_p++;
+		consoleplayer = *demo_p++;
+	}
 	
     for (i=0 ; i<MAXPLAYERS ; i++) 
 	playeringame[i] = *demo_p++; 
