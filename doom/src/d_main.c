@@ -568,6 +568,54 @@ void D_AddFile (char *file)
 //
 void IdentifyVersion(void)
 {
+	int pnum; // Yeah guys, it's cringe code
+	if ((pnum = M_CheckParm("-game"))) {
+		char* iwad_path = myargv[pnum + 1];
+		char* iwad_name = PathFindFileNameA(iwad_path);
+
+		if (access(iwad_path, O_RDONLY))
+			I_Error("Cannot open file!");
+
+		gamemode = commercial;
+
+		if (!strcmp(iwad_name, "doom2f.wad")) {
+			// We should handle languages in config files.
+			language = french;
+			gamemission = doom2;
+			printf("French version\n");
+		}
+
+		if (!strcmp(iwad_name, "doom2.wad"))
+			gamemission = doom2;
+
+		if (!strcmp(iwad_name, "plutonia.wad"))
+			gamemission = pack_plut;
+
+		if (!strcmp(iwad_name, "plutonia.wad"))
+			gamemission = pack_plut;
+
+		if (!strcmp(iwad_name, "tnt.wad"))
+			gamemission = pack_tnt;
+
+		if (!strcmp(iwad_name, "doomu.wad")) {
+			gamemode = retail;
+		}
+
+		if (!strcmp(iwad_name, "doom.wad")) {
+
+			gamemode = registered;
+		}
+
+		if (!strcmp(iwad_name, "doom1.wad")) {
+
+			gamemode = shareware;
+		}
+
+		D_AddFile(iwad_path);
+
+		return;
+	}
+
 
 	char* doom1wad;
 	char* doomwad;
@@ -658,62 +706,6 @@ void IdentifyVersion(void)
 		D_AddFile(DEVMAPS"cdata/texture1.lmp");
 		D_AddFile(DEVMAPS"cdata/pnames.lmp");
 		strcpy(basedefault, DEVDATA"default.cfg");
-		return;
-	}
-
-	int pnum; // Yeah guys, it's cringe code
-	if ((pnum = M_CheckParm("-game"))) {
-		char* iwad_path = myargv[pnum + 1];
-		char* iwad_name = PathFindFileNameA(iwad_path);
-
-		if (access(iwad_path, O_RDONLY))
-			I_Error("Cannot open file!");
-
-		gamemode = commercial;
-
-		if (!strcmp(iwad_name, "doom2f.wad")) {
-			// We should handle languages in config files.
-			language = french;
-			gamemission = doom2;
-			printf("French version\n");
-		}
-
-		if (!strcmp(iwad_name, "doom2.wad"))
-			gamemission = doom2;
-
-		if (!strcmp(iwad_name, "plutonia.wad"))
-			gamemission = pack_plut;
-
-		if (!strcmp(iwad_name, "plutonia.wad"))
-			gamemission = pack_plut;
-
-		if (!strcmp(iwad_name, "tnt.wad"))
-			gamemission = pack_tnt;
-
-		if (!strcmp(iwad_name, "doomu.wad")) {
-			gamemode = retail;
-		}
-
-		if (!strcmp(iwad_name, "doom.wad")) {
-
-			gamemode = registered;
-		}
-
-		if (!strcmp(iwad_name, "doom1.wad")) {
-
-			gamemode = shareware;
-		}
-
-		free(doom2wad);
-		free(doomuwad); // HEAP ERROR for some reasons
-		free(doomwad);
-		free(doom1wad);
-		free(plutoniawad);
-		free(tntwad);
-		free(doom2fwad);
-
-		D_AddFile(iwad_path);
-
 		return;
 	}
 
