@@ -49,6 +49,7 @@ DEVMODEA X_DevMode = { 0 };
 
 int		X_width;
 int		X_height;
+Dboolean in_focus = true;
 
 // Fake mouse handling.
 // This cannot work properly w/o DGA.
@@ -62,7 +63,7 @@ void I_SetDevmode(DEVMODEA* Dmode, int flags) {
 	if (fullscreen) {
 		int err_msg = ChangeDisplaySettingsA(Dmode, flags);
 		if (err_msg)
-			I_Error("I_InitGraphics: cannot change display settings: %d", err_msg);
+			I_Error("I_SetDevmode: cannot change display settings: %d", err_msg);
 	}
 }
 
@@ -203,7 +204,7 @@ void I_StartTic(void)
 		DispatchMessageA(&DoomMessage);
 	}
 
-	if (grabMouse && !menuactive && !demoplayback) {
+	if (grabMouse && !menuactive && !demoplayback && in_focus) {
 
 		if (!--doPointerWarp)
 		{
@@ -354,10 +355,12 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 	case WM_KILLFOCUS:
 		I_SetDevmode(NULL, 0);
 		if (fullscreen) { ShowWindow(hwnd, SW_MINIMIZE); }
+		in_focus = false;
 		break;
 
 	case WM_ACTIVATE:
 		I_SetDevmode(&X_DevMode, CDS_FULLSCREEN);
+		in_focus = true;
 		break;
 
 		// key presses
