@@ -45,6 +45,8 @@ HDC			X_mainDC;
 MSG			DoomMessage;
 BITMAPINFO* bmi;
 
+DEVMODEA X_DevMode = { 0 };
+
 int		X_width;
 int		X_height;
 
@@ -55,6 +57,14 @@ Dboolean		grabMouse;
 int		doPointerWarp = POINTER_WARP_COUNTDOWN;
 
 Dboolean fullscreen = false;
+
+void I_SetDevmode(DEVMODEA* Dmode, int flags) {
+	if (fullscreen) {
+		int err_msg = ChangeDisplaySettingsA(Dmode, flags);
+		if (err_msg)
+			I_Error("I_InitGraphics: cannot change display settings: %d", err_msg);
+	}
+}
 
 //
 //  Translates the key currently in X_event
@@ -175,14 +185,20 @@ void I_StartTic(void)
 	if (!X_mainWindow)
 		return;
 
+	// Other events P.S Yeah guys this is not the best solution...
+	if (PeekMessageA(&DoomMessage, X_mainWindow, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&DoomMessage);
+		DispatchMessageA(&DoomMessage);
+	}
+
 	// Process key pressing
-	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_KEYDOWN, WM_SYSKEYUP, PM_REMOVE)) {
+	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_KEYDOWN, WM_MOUSEWHEEL, PM_REMOVE)) {
 		TranslateMessage(&DoomMessage);
 		DispatchMessageA(&DoomMessage);
 	}
 
 	// Process mouse
-	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_MOUSEMOVE, WM_MOUSEWHEEL, PM_REMOVE)) {
+	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_MOUSEMOVE, WM_MOUSEWHEEL, PM_REMOVE )) {
 		TranslateMessage(&DoomMessage);
 		DispatchMessageA(&DoomMessage);
 	}
@@ -335,6 +351,15 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		I_Quit();
 		break;
 
+	case WM_KILLFOCUS:
+		I_SetDevmode(NULL, 0);
+		if (fullscreen) { ShowWindow(hwnd, SW_MINIMIZE); }
+		break;
+
+	case WM_ACTIVATE:
+		I_SetDevmode(&X_DevMode, CDS_FULLSCREEN);
+		break;
+
 		// key presses
 	case WM_KEYDOWN:
 		event.type = ev_keydown;
@@ -354,13 +379,13 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		event.data1 = xlatekey(wparam);
 		D_PostEvent(&event);
 		// fprintf(stderr, "k");
-		break;
+		return DefWindowProcA(hwnd, msg, wparam, lparam); // for alt+f4 handling
 	case WM_SYSKEYUP:
 		event.type = ev_keyup;
 		event.data1 = xlatekey(wparam);
 		D_PostEvent(&event);
 		// fprintf(stderr, "ku");
-		break;
+		return DefWindowProcA(hwnd, msg, wparam, lparam); // for alt+f4 handling
 
 
 		// Button up check
@@ -483,16 +508,10 @@ void I_InitGraphics(void)
 		x = 0;
 		y = 0;
 
-		DEVMODEA dev_fullscreen = { 0 };
-
-		dev_fullscreen.dmSize = sizeof(dev_fullscreen);
-		dev_fullscreen.dmPelsWidth = X_width;
-		dev_fullscreen.dmPelsHeight = X_height;
-		dev_fullscreen.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
-
-		int err_msg = ChangeDisplaySettingsA(&dev_fullscreen, CDS_FULLSCREEN);
-		if (err_msg)
-			I_Error("I_InitGraphics: cannot change display settings: %d", err_msg);
+		X_DevMode.dmSize = sizeof(X_DevMode);
+		X_DevMode.dmPelsWidth = X_width;
+		X_DevMode.dmPelsHeight = X_height;
+		X_DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
 	}
 	else {

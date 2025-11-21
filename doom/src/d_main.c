@@ -568,6 +568,11 @@ void D_AddFile (char *file)
 //
 void IdentifyVersion(void)
 {
+	char* home = getenv("userprofile");
+	if (!home)
+		I_Error("Please set %HOME% to your home directory");
+	sprintf(basedefault, "%s\\doomrc", home);
+
 	int pnum; // Yeah guys, it's cringe code
 	if ((pnum = M_CheckParm("-game"))) {
 		char* iwad_path = myargv[pnum + 1];
@@ -647,6 +652,17 @@ void IdentifyVersion(void)
 		return;
 	}
 
+	if (M_CheckParm("-shdev"))
+	{
+		gamemode = shareware;
+		devparm = true;
+		D_AddFile(DEVDATA"doom1.wad");
+		D_AddFile(DEVMAPS"data_se/texture1.lmp");
+		D_AddFile(DEVMAPS"data_se/pnames.lmp");
+		strcpy(basedefault, DEVDATA"default.cfg");
+		return;
+	}
+
 	char* doom1wad;
 	char* doomwad;
 	char* doomuwad;
@@ -657,7 +673,6 @@ void IdentifyVersion(void)
 	char* tntwad;
 
 	//#ifdef NORMALUNIX
-	char* home;
 	char* doomwaddir;
 	doomwaddir = getenv("DOOMWADDIR");
 	if (!doomwaddir)
@@ -692,22 +707,7 @@ void IdentifyVersion(void)
 	doom2fwad = malloc(strlen(doomwaddir) + 1 + 10 + 1);
 	sprintf(doom2fwad, "%s/doom2f.wad", doomwaddir);
 
-	home = getenv("userprofile");
-	if (!home)
-		I_Error("Please set $HOME to your home directory");
-	sprintf(basedefault, "%s\\doomrc", home);
 	//#endif
-
-	if (M_CheckParm("-shdev"))
-	{
-		gamemode = shareware;
-		devparm = true;
-		D_AddFile(DEVDATA"doom1.wad");
-		D_AddFile(DEVMAPS"data_se/texture1.lmp");
-		D_AddFile(DEVMAPS"data_se/pnames.lmp");
-		strcpy(basedefault, DEVDATA"default.cfg");
-		return;
-	}
 
 	if (!access(doom2fwad, R_OK))
 	{
