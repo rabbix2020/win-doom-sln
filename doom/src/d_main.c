@@ -617,6 +617,36 @@ void IdentifyVersion(void)
 	}
 
 
+	if (M_CheckParm("-regdev"))
+	{
+		gamemode = registered;
+		devparm = true;
+		D_AddFile(DEVDATA"doom.wad");
+		D_AddFile(DEVMAPS"data_se/texture1.lmp");
+		D_AddFile(DEVMAPS"data_se/texture2.lmp");
+		D_AddFile(DEVMAPS"data_se/pnames.lmp");
+		strcpy(basedefault, DEVDATA"default.cfg");
+		return;
+	}
+
+	if (M_CheckParm("-comdev"))
+	{
+		gamemode = commercial;
+		devparm = true;
+		/* I don't bother
+		if(plutonia)
+			D_AddFile (DEVDATA"plutonia.wad");
+		else if(tnt)
+			D_AddFile (DEVDATA"tnt.wad");
+		else*/
+		D_AddFile(DEVDATA"doom2.wad");
+
+		D_AddFile(DEVMAPS"cdata/texture1.lmp");
+		D_AddFile(DEVMAPS"cdata/pnames.lmp");
+		strcpy(basedefault, DEVDATA"default.cfg");
+		return;
+	}
+
 	char* doom1wad;
 	char* doomwad;
 	char* doomuwad;
@@ -675,36 +705,6 @@ void IdentifyVersion(void)
 		D_AddFile(DEVDATA"doom1.wad");
 		D_AddFile(DEVMAPS"data_se/texture1.lmp");
 		D_AddFile(DEVMAPS"data_se/pnames.lmp");
-		strcpy(basedefault, DEVDATA"default.cfg");
-		return;
-	}
-
-	if (M_CheckParm("-regdev"))
-	{
-		gamemode = registered;
-		devparm = true;
-		D_AddFile(DEVDATA"doom.wad");
-		D_AddFile(DEVMAPS"data_se/texture1.lmp");
-		D_AddFile(DEVMAPS"data_se/texture2.lmp");
-		D_AddFile(DEVMAPS"data_se/pnames.lmp");
-		strcpy(basedefault, DEVDATA"default.cfg");
-		return;
-	}
-
-	if (M_CheckParm("-comdev"))
-	{
-		gamemode = commercial;
-		devparm = true;
-		/* I don't bother
-		if(plutonia)
-			D_AddFile (DEVDATA"plutonia.wad");
-		else if(tnt)
-			D_AddFile (DEVDATA"tnt.wad");
-		else*/
-		D_AddFile(DEVDATA"doom2.wad");
-
-		D_AddFile(DEVMAPS"cdata/texture1.lmp");
-		D_AddFile(DEVMAPS"cdata/pnames.lmp");
 		strcpy(basedefault, DEVDATA"default.cfg");
 		return;
 	}
