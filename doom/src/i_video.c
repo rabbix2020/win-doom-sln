@@ -187,19 +187,7 @@ void I_StartTic(void)
 		return;
 
 	// Other events P.S Yeah guys this is not the best solution...
-	if (PeekMessageA(&DoomMessage, X_mainWindow, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&DoomMessage);
-		DispatchMessageA(&DoomMessage);
-	}
-
-	// Process key pressing
-	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_KEYDOWN, WM_MOUSEWHEEL, PM_REMOVE)) {
-		TranslateMessage(&DoomMessage);
-		DispatchMessageA(&DoomMessage);
-	}
-
-	// Process mouse
-	if (PeekMessageA(&DoomMessage, X_mainWindow, WM_MOUSEMOVE, WM_MOUSEWHEEL, PM_REMOVE )) {
+	while (PeekMessageA(&DoomMessage, X_mainWindow, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&DoomMessage);
 		DispatchMessageA(&DoomMessage);
 	}
@@ -337,14 +325,6 @@ void I_SetPalette(byte* palette)
 LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	POINT xmotion;
 	event_t event;
-
-	if (msg == WM_LBUTTONUP || msg == WM_MBUTTONUP || msg == WM_RBUTTONUP) {
-		event.type = ev_mouse;
-		event.data1 = 0;
-		event.data2 = event.data3 = 0;
-		D_PostEvent(&event);
-		return;
-	}
 	
 	switch (msg)
 	{
@@ -391,25 +371,31 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		return DefWindowProcA(hwnd, msg, wparam, lparam); // for alt+f4 handling
 
 
-		// Button up check
+	// Button press check
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+
 	case WM_LBUTTONDOWN:
-		event.type = ev_mouse;
-		event.data1 = 1;
-		event.data2 = event.data3 = 0;
-		D_PostEvent(&event);
-		break;
 	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN: {
+		int temp = 0;
+
+		if (wparam & MK_LBUTTON)
+			temp |= 1;
+
+		if (wparam & MK_RBUTTON)
+			temp |= 2;
+
+		if (wparam & MK_MBUTTON)
+			temp |= 4;
+
 		event.type = ev_mouse;
-		event.data1 = 4;
+		event.data1 = temp;
 		event.data2 = event.data3 = 0;
 		D_PostEvent(&event);
 		break;
-	case WM_RBUTTONDOWN:
-		event.type = ev_mouse;
-		event.data1 = 2;
-		event.data2 = event.data3 = 0;
-		D_PostEvent(&event);
-		break;
+	}
 
 		// mouse move
 	case WM_MOUSEMOVE:
