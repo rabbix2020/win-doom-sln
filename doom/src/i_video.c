@@ -67,25 +67,6 @@ void I_SetDevmode(DEVMODEA* Dmode, int flags) {
 	}
 }
 
-//
-//  Translates the key currently in X_event
-//
-
-int win32_TranslatePress(WPARAM wparam) {
-	switch (wparam)
-	{
-	case MK_LBUTTON:
-		return 1;
-	case MK_MBUTTON:
-		return 4;
-	case MK_RBUTTON:
-		return 2;
-	default:
-		return 0;
-		break;
-	}
-}
-
 int xlatekey(WPARAM wparam)
 {
 
@@ -398,11 +379,22 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 	}
 
 		// mouse move
-	case WM_MOUSEMOVE:
+	case WM_MOUSEMOVE: {
+		int temp = 0;
+
+		if (wparam & MK_LBUTTON)
+			temp |= 1;
+
+		if (wparam & MK_RBUTTON)
+			temp |= 2;
+
+		if (wparam & MK_MBUTTON)
+			temp |= 4;
+
 		GetCursorPos(&xmotion);
 		ScreenToClient(hwnd, &xmotion);
 		event.type = ev_mouse;
-		event.data1 = win32_TranslatePress(wparam);
+		event.data1 = temp;
 		event.data2 = (xmotion.x - lastmousex) << 2;
 		event.data3 = (lastmousey - xmotion.y) << 2;
 
@@ -424,6 +416,7 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 			}
 		}
 		break;
+	}
 	default:
 		return DefWindowProcA(hwnd, msg, wparam, lparam);
 	}
