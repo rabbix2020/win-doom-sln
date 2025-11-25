@@ -141,7 +141,10 @@ void I_ShutdownGraphics(void)
 	// Destroying window
 	free(bmi);
 	ReleaseDC(X_mainWindow, X_mainDC);
+
+	ShowCursor(TRUE);
 	DestroyWindow(X_mainWindow);
+	if (fullscreen) { I_SetDevmode(NULL, 0); }
 }
 
 

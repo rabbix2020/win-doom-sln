@@ -179,8 +179,6 @@ void I_Error (char *error, ...)
     _vsnprintf_s(temp_str, sizeof(temp_str) + 1, sizeof(temp_str), error, argptr);
     strcat(error_msg, temp_str);
 
-    MessageBoxA(NULL, temp_str, "DOOM", MB_ICONERROR);
-
     fprintf (stderr, "\n");
     va_end (argptr);
 
@@ -192,6 +190,8 @@ void I_Error (char *error, ...)
 
     D_QuitNetGame ();
     I_ShutdownGraphics();
+
+    MessageBoxA(NULL, temp_str, "DOOM", MB_ICONERROR);
 
     exit(-1);
 }
