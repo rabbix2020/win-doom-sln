@@ -170,7 +170,6 @@ void I_StartTic(void)
 	if (!X_mainWindow)
 		return;
 
-	// Other events P.S Yeah guys this is not the best solution...
 	while (PeekMessageA(&DoomMessage, X_mainWindow, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&DoomMessage);
 		DispatchMessageA(&DoomMessage);
@@ -309,6 +308,8 @@ void I_SetPalette(byte* palette)
 LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	POINT xmotion;
 	event_t event;
+
+	int buttons = 0;
 	
 	switch (msg)
 	{
@@ -363,19 +364,18 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN: {
-		int temp = 0;
 
 		if (wparam & MK_LBUTTON)
-			temp |= 1;
+			buttons |= 1;
 
 		if (wparam & MK_RBUTTON)
-			temp |= 2;
+			buttons |= 2;
 
 		if (wparam & MK_MBUTTON)
-			temp |= 4;
+			buttons |= 4;
 
 		event.type = ev_mouse;
-		event.data1 = temp;
+		event.data1 = buttons;
 		event.data2 = event.data3 = 0;
 		D_PostEvent(&event);
 		break;
@@ -383,21 +383,20 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 
 		// mouse move
 	case WM_MOUSEMOVE: {
-		int temp = 0;
 
 		if (wparam & MK_LBUTTON)
-			temp |= 1;
+			buttons |= 1;
 
 		if (wparam & MK_RBUTTON)
-			temp |= 2;
+			buttons |= 2;
 
 		if (wparam & MK_MBUTTON)
-			temp |= 4;
+			buttons |= 4;
 
 		GetCursorPos(&xmotion);
 		ScreenToClient(hwnd, &xmotion);
 		event.type = ev_mouse;
-		event.data1 = temp;
+		event.data1 = buttons;
 		event.data2 = (xmotion.x - lastmousex) << 2;
 		event.data3 = (lastmousey - xmotion.y) << 2;
 
