@@ -125,6 +125,10 @@ int xlatekey(WPARAM wparam)
 		rc = '.';
 		break;
 
+	case VK_OEM_3:
+		rc = '~';
+		break;
+
 	default:
 		rc = wparam;
 		if (rc >= 'A' && rc <= 'Z')
