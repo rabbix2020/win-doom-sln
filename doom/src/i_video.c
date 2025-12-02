@@ -67,6 +67,18 @@ void I_SetDevmode(DEVMODEA* Dmode, int flags) {
 	}
 }
 
+void I_GetMousePos(POINT* pPoint) {
+	GetCursorPos(pPoint);
+	ScreenToClient(X_mainWindow, pPoint);
+}
+
+void I_SetMousePos(int x, int y) {
+	POINT screenCoords = (POINT){ x , y};
+
+	ClientToScreen(X_mainWindow, &screenCoords);
+	SetCursorPos(screenCoords.x, screenCoords.y);
+}
+
 int xlatekey(WPARAM wparam)
 {
 
@@ -183,11 +195,7 @@ void I_StartTic(void)
 
 		if (!--doPointerWarp)
 		{
-			RECT temp_rect;
-			GetClientRect(X_mainWindow, &temp_rect);
-			ClientToScreen(X_mainWindow, &temp_rect);
-
-			SetCursorPos(temp_rect.left+(X_width >> 1), temp_rect.top+(X_height >> 1));
+			I_SetMousePos(X_width >> 1, X_height >> 1);
 
 			lastmousex = X_width >> 1;
 			lastmousey = X_height >> 1;
@@ -397,8 +405,7 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		if (wparam & MK_MBUTTON)
 			buttons |= 4;
 
-		GetCursorPos(&xmotion);
-		ScreenToClient(hwnd, &xmotion);
+		I_GetMousePos(&xmotion);
 		event.type = ev_mouse;
 		event.data1 = buttons;
 		event.data2 = (xmotion.x - lastmousex) << 2;
