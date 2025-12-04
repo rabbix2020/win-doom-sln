@@ -124,7 +124,7 @@ int             gametic;
 int             levelstarttic;          // gametic at level start 
 int             totalkills, totalitems, totalsecret;    // for intermission 
  
-char            demoname[32*8]; 
+char            demoname[MAX_PATH]; 
 Dboolean         demorecording; 
 Dboolean         demoplayback; 
 Dboolean		netdemo; 
