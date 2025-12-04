@@ -416,8 +416,8 @@ LRESULT CALLBACK DoomWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 			lastmousex = xmotion.x;
 			lastmousey = xmotion.y;
 
-			if (xmotion.x != X_width / 2 &&
-				xmotion.y != X_height / 2)
+			if (xmotion.x != lastmousex / 2 &&
+				xmotion.y != lastmousey / 2)
 			{
 				D_PostEvent(&event);
 				// fprintf(stderr, "m");
