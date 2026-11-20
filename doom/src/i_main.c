@@ -51,16 +51,3 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     D_DoomMain();
     return 1;
 }
-
-int
-main
-(int		argc,
-    char** argv)
-{
-    myargc = argc;
-    myargv = argv;
-
-    D_DoomMain();
-
-    return 0;
-}

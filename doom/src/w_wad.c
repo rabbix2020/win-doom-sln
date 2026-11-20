@@ -456,7 +456,7 @@ W_ReadLump
 		
     lseek (handle, l->position, SEEK_SET);
     c = read (handle, dest, l->size);
-
+    
     if (c < l->size)
 	I_Error ("W_ReadLump: only read %i of %i on lump %i",
 		 c,l->size,lump);	
